@@ -1,90 +1,86 @@
-import cloudscraper
+# ===============================================================
+# Copyright (c) 2025 Karim Elyamani. All rights reserved.
+# This script is the intellectual property of Karim Elyamani.
+# Unauthorized copying, editing, or distribution of this code,
+# via any medium, is strictly prohibited without written permission.
+# ===============================================================
+
+import requests
+import json
 import random
-import time
-import os
+import string
 
-# --- COLORS ---
-G = '\033[1;32m'
-R = '\033[1;31m'
-W = '\033[1;37m'
-C = '\033[1;36m'
-Y = '\033[1;33m'
-
-def logo():
-    os.system('clear')
-    print(f"""
-{C}   ______   __  __  __  __  ______   ______    
-{C}  /\  __ \ /\ \/ / /\ \/ / /\  __ \ /\  == \   
-{C}  \ \  __ \ \ \  _"-\ \  _"-\ \  __ \ \  __<   
-{C}   \ \_\ \_\ \ \_\ \_\ \_\ \_\ \_\ \_\ \_\ \_\ 
-{C}    \/_/\/_/  \/_/\/_/\/_/\/_/\/_/\/_/\/_/ /_/ 
-{Y}  ___________________________________________
-{W}  | {G}OWNER    {W}: {C}RAI AMMAR (PROFESSOR)       {W}|
-{W}  | {G}BRAND    {W}: {C}AMMAR-RAI TECH™             {W}|
-{W}  | {G}WHATSAPP {W}: {C}+923018787786               {W}|
-{W}  | {G}VERSION  {W}: {C}3.5 (ULTRA BYPASS)          {W}|
-{Y}  -------------------------------------------
-    """)
-
-def end_dashboard(status, message):
-    print(f"\n{Y}  ===========================================")
-    print(f"{W}  |            {G}RESULT DASHBOARD             {W}|")
-    print(f"{Y}  ===========================================")
-    print(f"{W}  | {G}STATUS  {W}: {C}{status}")
-    print(f"{W}  | {G}MESSAGE {W}: {W}{message}")
-    print(f"{Y}  -------------------------------------------")
-    print(f"{G}   DEVELOPED BY: {W}AMMAR-RAI TECH™")
-    print(f"{Y}  ===========================================\n")
-
-def run_script():
-    logo()
-    post_url = input(f"{G}[+]{C} Post URL {W}: ")
-    qty = input(f"{G}[+]{C} Quantity (Max 31) {W}: ")
-    
-    print(f"\n{Y}[*] Bypassing Cloudflare & Getting Token...")
-    
-    # Cloudscraper استعمال کریں جو خودکار طور پر سکیورٹی بائی پاس کرتا ہے
-    scraper = cloudscraper.create_scraper()
-    
+def PolyDev_InstaLikes():
+    print("Script by Karim Elyamani - Unauthorized edits are prohibited.")
+    instagram_link = input("Enter Instagram post URL: ")
     try:
-        # سٹیپ 1: ٹوکن فیچ کرنا
-        res = scraper.get("https://leofame.com/free-instagram-likes", timeout=25)
-        
-        # کوکیز سے ٹوکن نکالنا
-        token = res.cookies.get("token")
-        
-        # اگر کوکیز میں نہ ملے تو پیج کے اندر سے نکالیں
-        if not token and 'name="token" value="' in res.text:
-            token = res.text.split('name="token" value="')[1].split('"')[0]
+        quantity = int(input("Enter number of likes (max 31): "))
+        if quantity > 31:
+            print("Max allowed is 31. Setting quantity to 31.")
+            quantity = 31
+    except ValueError:
+        print("Invalid input. Setting quantity to 31.")
+        quantity = 31
 
-        if not token:
-            end_dashboard("FAILED", "Security Too High! Change VPN Location to USA/UK.")
-            return
+    random_text_number = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+    session = requests.Session()
 
-        # سٹیپ 2: لائکس بھیجنا
-        payload = {
-            "token": token,
-            "timezone_offset": "5",
-            "free_link": post_url,
-            "quantity": str(qty)
+    def data_maker():
+        headers = {
+            "sec-ch-ua": '"Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"',
+            "sec-ch-ua-mobile": "?1",
+            "sec-ch-ua-platform": '"Android"',
+            "upgrade-insecure-requests": "1",
+            "user-agent": f"Mozilla/{random_text_number} (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "sec-fetch-site": "none",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-user": "?1",
+            "sec-fetch-dest": "document",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-GB,en;q=0.9",
+            "if-modified-since": "Sat, 12 Apr 2025 16:25:47 GMT",
+            "priority": "u=0, i",
+            "content-length": "0"
         }
+        session.get("https://leofame.com/free-instagram-likes", headers=headers)
+        cookies = session.cookies.get_dict()
+        return cookies.get("token"), cookies.get("ci_session")
 
-        print(f"{Y}[*] Injecting Likes... Please Wait.")
-        
-        api_url = "https://leofame.com/free-instagram-likes?api=1"
-        response = scraper.post(api_url, data=payload, timeout=25)
-        
-        if response.status_code == 200:
-            res_json = response.json()
-            if res_json.get("status") == "success":
-                end_dashboard("SUCCESS", "Likes Sent Successfully! ✅")
-            else:
-                end_dashboard("ERROR", res_json.get("message", "Rate Limit Reached"))
-        else:
-            end_dashboard("ERROR", "Provider Server Denied Access")
+    token, ci_session = data_maker()
+    if not token or not ci_session:
+        print("Failed to get token or ci_session.")
+        return
 
-    except Exception as e:
-        end_dashboard("CRASHED", "Connection Timeout - Use Faster Internet")
+    url = "https://leofame.com/free-instagram-likes?api=1"
+    data = {
+        "token": token,
+        "timezone_offset": "Africa/Casablanca",
+        "free_link": instagram_link,
+        "quantity": str(quantity)
+    }
+    length = len(json.dumps(data).encode())
 
-if __name__ == "__main__":
-    run_script()
+    headers = {
+        "content-length": str(length),
+        "sec-ch-ua-platform": "Android",
+        "user-agent": f"Mozilla/{random_text_number} (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36",
+        "sec-ch-ua": '"Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"',
+        "content-type": "application/x-www-form-urlencoded",
+        "sec-ch-ua-mobile": "?1",
+        "accept": "*/*",
+        "origin": "https://leofame.com",
+        "sec-fetch-site": "same-origin",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-dest": "empty",
+        "referer": "https://leofame.com/free-instagram-likes",
+        "accept-encoding": "gzip, deflate, br, zstd",
+        "accept-language": "en-GB,en;q=0.9",
+        "cookie": f"token={token}; ci_session={ci_session}"
+    }
+
+    response = session.post(url, headers=headers, data=data)
+    print(f"Status: {response.status_code}")
+    print("Response:", response.text)
+
+PolyDev_InstaLikes()
