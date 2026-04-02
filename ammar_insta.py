@@ -1,4 +1,4 @@
-import requests
+import cloudscraper
 import random
 import time
 import os
@@ -22,7 +22,7 @@ def logo():
 {W}  | {G}OWNER    {W}: {C}RAI AMMAR (PROFESSOR)       {W}|
 {W}  | {G}BRAND    {W}: {C}AMMAR-RAI TECH™             {W}|
 {W}  | {G}WHATSAPP {W}: {C}+923018787786               {W}|
-{W}  | {G}VERSION  {W}: {C}3.1 (STABLE FIX)            {W}|
+{W}  | {G}VERSION  {W}: {C}3.5 (ULTRA BYPASS)          {W}|
 {Y}  -------------------------------------------
     """)
 
@@ -41,31 +41,24 @@ def run_script():
     post_url = input(f"{G}[+]{C} Post URL {W}: ")
     qty = input(f"{G}[+]{C} Quantity (Max 31) {W}: ")
     
-    print(f"\n{Y}[*] Bypassing Security & Getting Token...")
+    print(f"\n{Y}[*] Bypassing Cloudflare & Getting Token...")
     
-    # بہتر ہیڈرز تاکہ ویب سائٹ کو لگے کہ یہ موبائل براؤزر ہے
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Connection": "keep-alive",
-        "Upgrade-Insecure-Requests": "1"
-    }
-
-    session = requests.Session()
+    # Cloudscraper استعمال کریں جو خودکار طور پر سکیورٹی بائی پاس کرتا ہے
+    scraper = cloudscraper.create_scraper()
     
     try:
-        # سٹیپ 1: ٹوکن حاصل کرنا (With Timeout)
-        res = session.get("https://leofame.com/free-instagram-likes", headers=headers, timeout=20)
-        token = session.cookies.get("token")
+        # سٹیپ 1: ٹوکن فیچ کرنا
+        res = scraper.get("https://leofame.com/free-instagram-likes", timeout=25)
         
-        if not token:
-            # متبادل طریقہ اگر کوکیز سے ٹوکن نہ ملے
-            if 'name="token" value="' in res.text:
-                token = res.text.split('name="token" value="')[1].split('"')[0]
+        # کوکیز سے ٹوکن نکالنا
+        token = res.cookies.get("token")
+        
+        # اگر کوکیز میں نہ ملے تو پیج کے اندر سے نکالیں
+        if not token and 'name="token" value="' in res.text:
+            token = res.text.split('name="token" value="')[1].split('"')[0]
 
         if not token:
-            end_dashboard("FAILED", "IP Blocked! Please Switch to Mobile Data or Use VPN.")
+            end_dashboard("FAILED", "Security Too High! Change VPN Location to USA/UK.")
             return
 
         # سٹیپ 2: لائکس بھیجنا
@@ -76,23 +69,22 @@ def run_script():
             "quantity": str(qty)
         }
 
-        print(f"{Y}[*] Submitting Request...")
-        api_headers = headers.copy()
-        api_headers.update({"X-Requested-With": "XMLHttpRequest", "Referer": "https://leofame.com/free-instagram-likes"})
+        print(f"{Y}[*] Injecting Likes... Please Wait.")
         
-        response = session.post("https://leofame.com/free-instagram-likes?api=1", headers=api_headers, data=payload, timeout=20)
+        api_url = "https://leofame.com/free-instagram-likes?api=1"
+        response = scraper.post(api_url, data=payload, timeout=25)
         
         if response.status_code == 200:
             res_json = response.json()
             if res_json.get("status") == "success":
                 end_dashboard("SUCCESS", "Likes Sent Successfully! ✅")
             else:
-                end_dashboard("ERROR", res_json.get("message", "Unknown Error"))
+                end_dashboard("ERROR", res_json.get("message", "Rate Limit Reached"))
         else:
-            end_dashboard("ERROR", "Server Rejected Request")
+            end_dashboard("ERROR", "Provider Server Denied Access")
 
     except Exception as e:
-        end_dashboard("CRASHED", "Connection Timeout - Try Again")
+        end_dashboard("CRASHED", "Connection Timeout - Use Faster Internet")
 
 if __name__ == "__main__":
     run_script()
